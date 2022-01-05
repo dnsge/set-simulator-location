@@ -5,11 +5,19 @@ func coordinate(from arguments: [String]) -> Result<CLLocationCoordinate2D> {
         return .failure("Incorrect number of arguments, expected 2 got \(arguments.count)")
     }
 
-    guard let latitude = arguments.first.flatMap(Double.init),
-            let longitude = arguments.last.flatMap(Double.init) else
-    {
-        return .failure("Expected 2 numbers, got '\(arguments[0])' and '\(arguments[1])'")
+    let latitudeStr = trimCoordinateSymbols(arguments[0])
+    let longitudeStr = trimCoordinateSymbols(arguments[1])
+
+    guard let latitude = Double(latitudeStr), let longitude = Double(longitudeStr) else {
+        return .failure("Expected 2 numbers, got '\(latitudeStr)' and '\(longitudeStr)'")
     }
 
     return .success(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+}
+
+// comma and degrees symbol (º)
+private let coordinateSymbolsSet = CharacterSet(charactersIn: ",\u{B0}")
+
+private func trimCoordinateSymbols(_ string: String) -> String {
+    return string.trimmingCharacters(in: coordinateSymbolsSet)
 }
